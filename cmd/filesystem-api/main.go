@@ -2,10 +2,15 @@ package main
 
 import (
 	"filesystem-api/api"
-	"log"
 	"os"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+)
+
+var (
+	fsAPICfg = api.Config{}
+	fsAPI    = api.Handler{}
 )
 
 func main() {
@@ -13,9 +18,7 @@ func main() {
 		Name:        "Filesystem API",
 		Description: "api used to interact with a remote filesystem",
 	}
-
-	h := api.NewHandler()
-	app.Flags = append(app.Flags, h.Flags()...)
+	app.Flags = append(app.Flags, fsAPICfg.Flags()...)
 	app.Action = run
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
@@ -23,5 +26,6 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-
+	fsAPI.Initialize(&fsAPICfg)
+	return fsAPI.Start()
 }
